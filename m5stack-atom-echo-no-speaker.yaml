@@ -33,6 +33,10 @@ ota:
   - platform: esphome
     id: ota_esphome
 
+dashboard_import:
+  package_import_url: github://esphome/firmware/voice-assistant/m5stack-atom-echo.yaml@main
+
+
 wifi:
   on_connect:
     - delay: 5s # Gives time for improv results to be transmitted
@@ -294,9 +298,9 @@ external_components:
     components:
       - esp_adf
     refresh: 0s
-#  - source: github://jesserockz/esphome-components
-#    components: [file]
-#    refresh: 0s
+  - source: github://jesserockz/esphome-components
+    components: [file]
+    refresh: 0s
 
 esp_adf:
 
