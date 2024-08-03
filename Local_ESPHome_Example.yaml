@@ -1,0 +1,34 @@
+substitutions:
+  name: m5stack-atom-echo-your-id
+  friendly_name: Atom Echo Your Name
+  media_player_service: notify.any_media_player_serverice
+  key: your_key
+
+packages:
+  m5stack.atom-echo-voice-assistant-no-speaker: github://TheDeadEndLink/M5-Atom-Echo-Voice-Assistant-No-Speaker-Output/m5stack-atom-echo-no-speaker.yaml@main
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+  friendly_name: ${friendly_name}
+  
+api:
+  encryption:
+    key: ${key}
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+voice_assistant:
+  on_tts_start:
+    - homeassistant.service:
+        service: ${media_player_service}
+        data:
+          message: !lambda return x;
+
+  on_timer_finished:
+    - homeassistant.service:
+        service: ${media_player_service}
+        data:
+          message: "Timer finished"
