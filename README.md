@@ -1,4 +1,3 @@
-# M5-Atom-Echo-Voice-Assistant-No-Speaker-Output
 # Modification of the Home Assistant Voice Assistant for M5Stack Atom Echo 
 based on https://github.com/esphome/firmware/blob/main/voice-assistant/m5stack-atom-echo.adopted.yaml
 
