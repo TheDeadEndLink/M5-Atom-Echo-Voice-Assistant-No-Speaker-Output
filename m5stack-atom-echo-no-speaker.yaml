@@ -20,6 +20,10 @@ esphome:
   friendly_name: M5Stack Atom Echo
   min_version: 2024.6.0
   name_add_mac_suffix: true
+  project:
+    name: m5stack.atom-echo-voice-assistant-no-speaker
+    version: "1.0"
+  
 
 esp32:
   board: m5stack-atom
