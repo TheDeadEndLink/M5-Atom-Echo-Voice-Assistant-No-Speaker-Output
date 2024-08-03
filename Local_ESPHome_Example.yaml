@@ -1,7 +1,7 @@
 substitutions:
   name: m5stack-atom-echo-your-id
   friendly_name: Atom Echo Your Name
-  media_player_service: notify.any_media_player_serverice
+  media_player_service: notify.any_media_player_service
   key: your_key
 
 packages:
