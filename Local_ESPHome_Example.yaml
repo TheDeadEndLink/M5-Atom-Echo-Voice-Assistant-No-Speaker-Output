@@ -5,30 +5,8 @@ substitutions:
   key: your_key
 
 packages:
-  m5stack.atom-echo-voice-assistant-no-speaker: github://TheDeadEndLink/M5-Atom-Echo-Voice-Assistant-No-Speaker-Output/m5stack-atom-echo-no-speaker.yaml@main
-
-esphome:
-  name: ${name}
-  name_add_mac_suffix: false
-  friendly_name: ${friendly_name}
-  
-api:
-  encryption:
-    key: ${key}
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-
-voice_assistant:
-  on_tts_start:
-    - homeassistant.service:
-        service: ${media_player_service}
-        data:
-          message: !lambda return x;
-
-  on_timer_finished:
-    - homeassistant.service:
-        service: ${media_player_service}
-        data:
-          message: "Timer finished"
+  m5stack.atom-echo-voice-assistant-no-speaker:
+    url: https://github.com/TheDeadEndLink/M5-Atom-Echo-Voice-Assistant-No-Speaker-Output
+    ref: main
+    file: m5stack-atom-echo-no-speaker.yaml
+    refresh: 1s
