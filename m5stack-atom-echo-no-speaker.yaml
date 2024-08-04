@@ -15,11 +15,18 @@
 # -----------------------------------------
 
 ---
+substitutions:
+  name: m5stack-atom-echo-xyz
+  friendly_name: Atom Echo Device
+  key: 2pRGOm2edU12Ppgnjp43nvVPYl8iPLJClK1PPN8k2vk=
+  media_player_service: notify.alexa_media_xyz
 
 esphome:
   name_add_mac_suffix: false
-  name: m5stack-atom-echo
-  friendly_name: M5Stack Atom Echo
+  name: ${name}
+  friendly_name: ${friendly_name}
+#  name: m5stack-atom-echo
+#  friendly_name: M5Stack Atom Echo
   min_version: 2024.6.0
   project:
     name: m5stack.atom-echo-voice-assistant-no-speaker
@@ -44,6 +51,8 @@ ota:
 #  package_import_url: github://esphome/firmware/voice-assistant/m5stack-atom-echo.yaml@main
 
 wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
   ap:
 #  on_connect:
 #    - delay: 5s # Gives time for improv results to be transmitted
@@ -111,6 +120,10 @@ voice_assistant:
         green: 0%
         brightness: 100%
         effect: none
+    - homeassistant.service:
+        service: ${media_player_service}
+        data:
+          message: !lambda return x;
   on_end:
     - delay: 1s
 #    - wait_until:
@@ -171,7 +184,10 @@ voice_assistant:
         then:
           - voice_assistant.start_continuous:
           - script.execute: reset_led
-
+    - homeassistant.service:
+        service: ${media_player_service}
+        data:
+          message: "Timer finished"
 binary_sensor:
   - platform: gpio
     pin:
