@@ -25,8 +25,6 @@ esphome:
   name_add_mac_suffix: false
   name: ${name}
   friendly_name: ${friendly_name}
-#  name: m5stack-atom-echo
-#  friendly_name: M5Stack Atom Echo
   min_version: 2024.6.0
   project:
     name: m5stack.atom-echo-voice-assistant-no-speaker
@@ -47,18 +45,10 @@ ota:
   - platform: esphome
     id: ota_esphome
 
-# dashboard_import:
-#  package_import_url: github://esphome/firmware/voice-assistant/m5stack-atom-echo.yaml@main
-
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   ap:
-#  on_connect:
-#    - delay: 5s # Gives time for improv results to be transmitted
-#    - ble.disable:
-#  on_disconnect:
-#    - ble.enable:
 
 button:
   - platform: safe_mode
@@ -81,19 +71,9 @@ microphone:
     adc_type: external
     pdm: true
 
-# -----------------------------------------
-# speaker:
-# - platform: i2s_audio
-#    id: echo_speaker
-#    i2s_dout_pin: GPIO22
-#    dac_type: external
-#    mode: mono
-# -----------------------------------------
-
 voice_assistant:
   id: va
   microphone: echo_microphone
-#  speaker: echo_speaker
   noise_suppression_level: 2
   auto_gain: 31dBFS
   volume_multiplier: 2.0
@@ -126,9 +106,6 @@ voice_assistant:
           message: !lambda return x;
   on_end:
     - delay: 1s
-#    - wait_until:
-#        not:
-#          speaker.is_playing:
     - script.execute: reset_led
   on_error:
     - light.turn_on:
@@ -156,28 +133,7 @@ voice_assistant:
           - light.turn_off: led
   on_timer_finished:
     - voice_assistant.stop:
-#    - switch.turn_on: timer_ringing
-#    - wait_until:
-#        not:
-#          microphone.is_capturing:
-#    - light.turn_on:
-#        id: led
-#        red: 0%
-#        green: 100%
-#        blue: 0%
-#        brightness: 100%
-#        effect: "Fast Pulse"
-#    - while:
-#        condition:
-#          switch.is_on: timer_ringing
-#        then:
-#          - lambda: id(echo_speaker).play(id(timer_finished_wave_file), sizeof(id(timer_finished_wave_file)));
-#          - delay: 1s
-#    - wait_until:
-#        not:
-#          speaker.is_playing:
     - light.turn_off: led
-#    - switch.turn_off: timer_ringing
     - if:
         condition:
           switch.is_on: use_wake_word
@@ -324,6 +280,3 @@ external_components:
 
 esp_adf:
 
-# file:
-#  - id: timer_finished_wave_file
-#    file: https://github.com/esphome/firmware/raw/main/voice-assistant/sounds/timer_finished.wav
