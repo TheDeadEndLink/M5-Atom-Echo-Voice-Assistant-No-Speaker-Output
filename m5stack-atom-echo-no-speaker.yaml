@@ -270,13 +270,17 @@ switch:
       - switch.turn_off: timer_ringing
 
 external_components:
-  - source: github://pr#5230
+  - source: github://kiklhorn/esphome/esphome
     components:
       - esp_adf
     refresh: 0s
-  - source: github://jesserockz/esphome-components
-    components: [file]
-    refresh: 0s
+#  - source: github://pr#5230
+#    components:
+#      - esp_adf
+#    refresh: 0s
+#   - source: github://jesserockz/esphome-components
+#     components: [file]
+#     refresh: 0s
 
 esp_adf:
 
