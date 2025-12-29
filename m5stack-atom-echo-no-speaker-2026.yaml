@@ -349,6 +349,7 @@ script:
               return strcmp(id(wake_word_engine_location).current_option(), "On button press") == 0;
           then:
             - voice_assistant.stop: 
+            - micro_wake_word.stop:
 
 switch:
   - platform: template
