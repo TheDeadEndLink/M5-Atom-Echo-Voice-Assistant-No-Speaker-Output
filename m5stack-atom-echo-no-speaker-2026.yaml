@@ -229,6 +229,9 @@ binary_sensor:
           #     else:
           #       - script.execute: start_wake_word
           - script.execute: start_wake_word
+          - voice_assistant.start:
+              silence_detection: false
+          
       - timing:
           - ON for at least 10s
         then:
@@ -321,9 +324,9 @@ script:
               - lambda:  |-
                   return strcmp(id(wake_word_engine_location).current_option(), "On button press") == 0;
           then:
-            - voice_assistant.start:
-                silence_detection: false
-
+            - lambda: id(va).set_use_wake_word(false);
+            - micro_wake_word.stop:
+            - voice_assistant.stop:
             
   - id: stop_wake_word
     then:
