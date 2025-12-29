@@ -353,16 +353,16 @@ switch:
       - script.execute: reset_led
     on_turn_off:
       - script.execute: reset_led
-  - platform: template
-    id: timer_ringing
-    optimistic: true
-    restore_mode: ALWAYS_OFF
-    on_turn_off:
-      # Turn off the repeat mode and disable the pause between playlist items
-      # Stop playing the alarm
-    on_turn_on:
-      # Turn on the repeat mode and pause for 1000 ms between playlist items/repeats
-      - switch.turn_off: timer_ringing
+  # - platform: template
+  #   id: timer_ringing
+  #   optimistic: true
+  #   restore_mode: ALWAYS_OFF
+  #   on_turn_off:
+  #     # Turn off the repeat mode and disable the pause between playlist items
+  #     # Stop playing the alarm
+  #   on_turn_on:
+  #     # Turn on the repeat mode and pause for 1000 ms between playlist items/repeats
+  #     - switch.turn_off: timer_ringing
 
 select:
   - platform: template
