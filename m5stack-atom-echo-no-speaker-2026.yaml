@@ -322,6 +322,7 @@ script:
                   return strcmp(id(wake_word_engine_location).current_option(), "On button press") == 0;
           then:
             - voice_assistant.start:
+                silence_detection: false
 
             
   - id: stop_wake_word
