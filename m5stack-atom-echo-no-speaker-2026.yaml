@@ -70,45 +70,45 @@ microphone:
     sample_rate: 16000
     correct_dc_offset: true
 
-speaker:
-  - platform: i2s_audio
-    id: echo_speaker
-    i2s_dout_pin: GPIO22
-    dac_type: external
-    bits_per_sample: 16bit
-    sample_rate: 16000
-    channel: stereo  # The Echo has poor playback audio quality when using mon audio
-    buffer_duration: 60ms
+# speaker:
+#   - platform: i2s_audio
+#     id: echo_speaker
+#     i2s_dout_pin: GPIO22
+#     dac_type: external
+#     bits_per_sample: 16bit
+#     sample_rate: 16000
+#     channel: stereo  # The Echo has poor playback audio quality when using mon audio
+#     buffer_duration: 60ms
 
-media_player:
-  - platform: speaker
-    name: None
-    id: echo_media_player
-    announcement_pipeline:
-      speaker: echo_speaker
-      format: WAV
-    codec_support_enabled: false
-    buffer_size: 6000
-    volume_min: 0.4
-    files:
-      - id: timer_finished_wave_file
-        file: https://github.com/esphome/wake-word-voice-assistants/raw/main/sounds/timer_finished.wav
-    on_announcement:
-      - if:
-          condition:
-            - microphone.is_capturing:
-          then:
-            - script.execute: stop_wake_word
-      - light.turn_on:
-          id: led
-          blue: 100%
-          red: 0%
-          green: 0%
-          brightness: 100%
-          effect: none
-    on_idle:
-      - script.execute: start_wake_word
-      - script.execute: reset_led
+# media_player:
+#   - platform: speaker
+#     name: None
+#     id: echo_media_player
+#     announcement_pipeline:
+#       speaker: echo_speaker
+#       format: WAV
+#     codec_support_enabled: false
+#     buffer_size: 6000
+#     volume_min: 0.4
+#     files:
+#       - id: timer_finished_wave_file
+#         file: https://github.com/esphome/wake-word-voice-assistants/raw/main/sounds/timer_finished.wav
+#     on_announcement:
+#       - if:
+#           condition:
+#             - microphone.is_capturing:
+#           then:
+#             - script.execute: stop_wake_word
+#       - light.turn_on:
+#           id: led
+#           blue: 100%
+#           red: 0%
+#           green: 0%
+#           brightness: 100%
+#           effect: none
+#     on_idle:
+#       - script.execute: start_wake_word
+#       - script.execute: reset_led
 
 voice_assistant:
   id: va
@@ -117,7 +117,7 @@ voice_assistant:
     microphone: echo_microphone
     channels: 0
     gain_factor: 4
-  media_player: echo_media_player
+  # media_player: echo_media_player
   noise_suppression_level: 2
   auto_gain: 31dBFS
   on_listening:
@@ -144,10 +144,10 @@ voice_assistant:
         effect: none
   on_end:
     # Handle the "nevermind" case where there is no announcement
-    - wait_until:
-        condition:
-          - media_player.is_announcing:
-        timeout: 0.5s
+    # - wait_until:
+    #    condition:
+    #      - media_player.is_announcing:
+    #    timeout: 0.5s
     # Restart only mWW if enabled; streaming wake words automatically restart
     - if:
         condition:
@@ -158,8 +158,8 @@ voice_assistant:
               - and:
                   - not:
                       voice_assistant.is_running:
-                  - not:
-                      speaker.is_playing:
+                  # - not:
+                  #    speaker.is_playing:
           - lambda: id(va).set_use_wake_word(false);
           - micro_wake_word.start:
     - script.execute: reset_led
@@ -191,10 +191,14 @@ voice_assistant:
         blue: 0%
         brightness: 100%
         effect: "Fast Pulse"
-    - wait_until:
-        - switch.is_off: timer_ringing
+    # - wait_until:
+    #     - switch.is_off: timer_ringing
     - light.turn_off: led
-    - switch.turn_off: timer_ringing
+    - homeassistant.service:
+        service: ${media_player_service}
+        data:
+          message: "Timer finished"
+    #  - switch.turn_off: timer_ringing
 
 binary_sensor:
   # button does the following:
@@ -213,13 +217,14 @@ binary_sensor:
           - ON for at least 50ms
           - OFF for at least 50ms
         then:
-          - if:
-              condition:
-                switch.is_on: timer_ringing
-              then:
-                - switch.turn_off: timer_ringing
-              else:
-                - script.execute: start_wake_word
+          # - if:
+          #     condition:
+          #       switch.is_on: timer_ringing
+          #     then:
+          #       - switch.turn_off: timer_ringing
+          #     else:
+          #       - script.execute: start_wake_word
+          - script.execute: start_wake_word
       - timing:
           - ON for at least 10s
         then:
@@ -304,6 +309,17 @@ script:
           then:
             - lambda: id(va).set_use_wake_word(true);
             - voice_assistant.start_continuous:
+      - if:
+          condition:
+            and:
+              - not:
+                  - voice_assistant.is_running:
+              - lambda:  |-
+                  return strcmp(id(wake_word_engine_location).current_option(), "On button press") == 0;
+          then:
+            - voice_assistant.start:
+
+            
   - id: stop_wake_word
     then:
       - if:
@@ -319,6 +335,12 @@ script:
               return strcmp(id(wake_word_engine_location).current_option(), "On device") == 0;
           then:
             - micro_wake_word.stop:
+      - if:
+          condition:
+            lambda: |-
+              return strcmp(id(wake_word_engine_location).current_option(), "On button press") == 0;
+          then:
+            - voice_assistant.stop: 
 
 switch:
   - platform: template
@@ -337,29 +359,9 @@ switch:
     restore_mode: ALWAYS_OFF
     on_turn_off:
       # Turn off the repeat mode and disable the pause between playlist items
-      - lambda: |-
-              id(echo_media_player)
-                ->make_call()
-                .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_OFF)
-                .set_announcement(true)
-                .perform();
-              id(echo_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 0);
       # Stop playing the alarm
-      - media_player.stop:
-          announcement: true
     on_turn_on:
       # Turn on the repeat mode and pause for 1000 ms between playlist items/repeats
-      - lambda: |-
-            id(echo_media_player)
-              ->make_call()
-              .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_ONE)
-              .set_announcement(true)
-              .perform();
-            id(echo_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 1000);
-      - media_player.speaker.play_on_device_media_file:
-          media_file: timer_finished_wave_file
-          announcement: true
-      - delay: 15min
       - switch.turn_off: timer_ringing
 
 select:
@@ -372,6 +374,7 @@ select:
     options:
       - In Home Assistant
       - On device
+      - On button press
     initial_option: On device
     on_value:
       - if:
@@ -390,6 +393,15 @@ select:
             - voice_assistant.stop:
             - delay: 500ms
             - micro_wake_word.start:
+
+      - if:
+          condition:
+            lambda: return x == "On button press";
+          then:
+            - lambda: id(va).set_use_wake_word(false);
+            - voice_assistant.stop:
+            - micro_wake_word.stop:
+          
 
 micro_wake_word:
   on_wake_word_detected:
