@@ -183,7 +183,7 @@ voice_assistant:
     - wait_until:
         not:
           microphone.is_capturing:
-    - switch.turn_on: timer_ringing
+    # - switch.turn_on: timer_ringing
     - light.turn_on:
         id: led
         red: 0%
